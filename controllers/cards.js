@@ -33,10 +33,16 @@ const deleteCard = (req, res) => {
       if (card) {
         res.status(200).send(card);
       } else {
-        res.status(400).send({ message: 'Удаляемая карточка не найдена' });
+        res
+          .status(404)
+          .send({ message: 'Удаляемая карточка с таким id не найдена' });
       }
     })
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Некорректный id карточки' });
+      } else res.status(500).send({ message: 'Произошла ошибка' });
+    });
 };
 
 const addCardLike = (req, res) => {

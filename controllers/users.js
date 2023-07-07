@@ -4,15 +4,15 @@ const getUserById = (req, res) => {
   const { userId } = req.params;
   User.findById(userId)
     .then((user) => {
-      if (user) {
-        res.status(200).send(user);
-      } else {
+      res.status(200).send(user);
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
         res
           .status(404)
           .send({ message: 'Пользователь по указанному id не найден' });
-      }
-    })
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка сервера' }));
+      } else res.status(500).send({ message: 'Произошла ошибка сервера', err });
+    });
 };
 
 const getAllUsers = (req, res) => {
@@ -41,7 +41,11 @@ const createUser = (req, res) => {
 const updateUser = (req, res) => {
   const { name, about, avatar } = req.body;
   const owner = req.user._id;
-  User.findByIdAndUpdate(owner, { name, about, avatar }, { new: true })
+  User.findByIdAndUpdate(
+    owner,
+    { name, about, avatar },
+    { new: true, runValidators: true },
+  )
     .then((user) => {
       if (user) {
         res.status(200).send(user);
@@ -65,7 +69,7 @@ const updateUser = (req, res) => {
 const updateUserAvatar = (req, res) => {
   const { avatar } = req.body;
   const owner = req.user._id;
-  User.findByIdAndUpdate(owner, { avatar }, { new: true })
+  User.findByIdAndUpdate(owner, { avatar }, { new: true, runValidators: true })
     .then((user) => {
       if (user) {
         res.status(200).send(user);

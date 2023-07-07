@@ -30,7 +30,7 @@ const deleteCard = (req, res) => {
       if (card) {
         res.status(200).send(card);
       } else {
-        res.status(404).send({ message: 'Удаляемая карточка не найдена' });
+        res.status(400).send({ message: 'Удаляемая карточка не найдена' });
       }
     })
     .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));

@@ -13,14 +13,17 @@ const createCard = (req, res) => {
   const owner = req.user._id;
   Card.create({ name, link, owner })
     .then((card) => {
-      if (card) res.status(201).send(card);
-      else {
-        res
-          .status(400)
-          .send({ message: 'Некорректные данные при создании карточки' });
-      }
+      res.status(201).send(card);
     })
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка сервера' }));
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(400).send({
+          message: 'Переданы некорректные данные при создании карточки',
+        });
+      } else {
+        res.status(500).send({ message: 'Произошла ошибка сервера' });
+      }
+    });
 };
 
 const deleteCard = (req, res) => {
@@ -45,11 +48,15 @@ const addCardLike = (req, res) => {
     { new: true },
   )
     .then((card) => {
-      res.status(200).send(card);
+      if (card) {
+        res.status(200).send(card);
+      } else {
+        res.status(404).send({ message: 'Карточка с таким id не найдена' });
+      }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(404).send({ message: 'Карточка не найдена' });
+        res.status(400).send({ message: 'Некорректный id карточки' });
       } else res.status(500).send({ message: 'Произошла ошибка' });
     });
 };
@@ -59,11 +66,15 @@ const deleteCardLike = (req, res) => {
   const { userId } = req.user._id;
   Card.findByIdAndUpdate(cardId, { $pull: { likes: userId } }, { new: true })
     .then((card) => {
-      res.status(200).send(card);
+      if (card) {
+        res.status(200).send(card);
+      } else {
+        res.status(404).send({ message: 'Карточка с таким id не найдена' });
+      }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(404).send({ message: 'Карточка не найдена' });
+        res.status(400).send({ message: 'Некорректный id карточки' });
       } else res.status(500).send({ message: 'Произошла ошибка' });
     });
 };

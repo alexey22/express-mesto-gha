@@ -1,6 +1,12 @@
+require('dotenv').config();
+
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
+
+const { createUser, login } = require('./controllers/users');
+const errorHandler = require('./middlewares/error');
 
 const { PORT = 3000, BASE_PATH } = process.env;
 const app = express();
@@ -9,21 +15,19 @@ const router = require('./routes');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
   family: 4,
 });
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '64a7e104665457b0b5ea193e',
-  };
-
-  next();
-});
+app.post('/signup', createUser);
+app.post('/signin', login);
 
 app.use(router);
+
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   // eslint-disable-next-line no-console

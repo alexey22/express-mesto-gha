@@ -12,16 +12,13 @@ const getUserById = (req, res, next) => {
     .then((user) => {
       if (user) res.status(200).send(user);
       else {
-        // res.status(404).send({ message: 'Пользователь с данным id не найден' });
         next(new NotFound('Пользователь с данным id не найден'));
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        // res.status(400).send({ message: 'Некорректный id не найден' });
         next(new BadRequest('Некорректный id'));
       } else {
-        // res.status(500).send({ message: 'Произошла ошибка сервера', err });
         next(new ServerError('Произошла ошибка сервера'));
       }
     });
@@ -33,7 +30,6 @@ const getAllUsers = (req, res, next) => {
       res.status(200).send(users);
     })
     .catch(() => {
-      // res.status(500).send({ message: 'Произошла ошибка сервера' });
       next(new ServerError('Произошла ошибка сервера'));
     });
 };
@@ -46,9 +42,6 @@ const createUser = (req, res, next) => {
   User.findOne({ email })
     .then((user) => {
       if (user) {
-        // res.status(400).send({
-        //   message: 'Пользователь с таким email уже существует',
-        // });
         throw new BadRequest('Пользователь с таким email уже существует');
       } else {
         bcrypt.hash(String(password), 10).then((hashedPassword) => {
@@ -62,17 +55,12 @@ const createUser = (req, res, next) => {
             .then((userFind) => res.status(201).send(userFind))
             .catch((err) => {
               if (err.name === 'ValidationError') {
-                // res.status(400).send({
-                //   message:
-                //     'Переданы некорректные данные при создании пользователя',
-                // });
                 next(
                   new BadRequest(
                     'Переданы некорректные данные при создании пользователя',
                   ),
                 );
               } else {
-                // res.status(500).send({ message: 'Произошла ошибка сервера' });
                 next(new ServerError('Произошла ошибка сервера'));
               }
             });
@@ -94,24 +82,17 @@ const updateUser = (req, res, next) => {
       if (user) {
         res.status(200).send(user);
       } else {
-        // res
-        //   .status(404)
-        //   .send({ message: 'Пользователь по указанному id не найден' });
         next(new NotFound('Пользователь по указанному id не найден'));
       }
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        // res.status(400).send({
-        //   message: 'Переданы некорректные данные при обновлении пользователя',
-        // });
         next(
           new BadRequest(
             'Переданы некорректные данные при обновлении пользователя',
           ),
         );
       } else {
-        // res.status(500).send({ message: 'Произошла ошибка сервера' });
         next(new ServerError('Произошла ошибка сервера'));
       }
     });
@@ -125,24 +106,17 @@ const updateUserAvatar = (req, res, next) => {
       if (user) {
         res.status(200).send(user);
       } else {
-        // res
-        //   .status(404)
-        //   .send({ message: 'Пользователь по указанному id не найден' });
         next(new NotFound('Пользователь по указанному id не найден'));
       }
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        // res.status(400).send({
-        //   message: 'Переданы некорректные данные при обновлении пользователя',
-        // });
         next(
           new BadRequest(
             'Переданы некорректные данные при обновлении пользователя',
           ),
         );
       } else {
-        // res.status(500).send({ message: 'Произошла ошибка сервера' });
         next(new ServerError('Произошла ошибка сервера'));
       }
     });
@@ -156,7 +130,6 @@ const login = (req, res, next) => {
   User.findOne({ email })
     .select('+password')
     .orFail(() => {
-      // new Error('Пользователь не найден'))
       next(
         new UnauthorizedError('Пользователь с таким email и паролем не найден'),
       );
@@ -186,7 +159,7 @@ const login = (req, res, next) => {
             res.send(user.toJSON());
           } else {
             // Если не совпадает -- вернуть ошибку
-            // res.status(401).send({ message: 'Неправильный пароль' });
+
             throw new UnauthorizedError(
               'Пользователь с таким email и паролем не найден',
             );
@@ -203,16 +176,13 @@ const getUser = (req, res, next) => {
     .then((user) => {
       if (user) res.status(200).send(user);
       else {
-        // res.status(404).send({ message: 'Пользователь с данным id не найден' });
         next(new BadRequest('Пользователь с данным id не найден'));
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        // res.status(400).send({ message: 'Некорректный id' });
         next(new BadRequest('Некорректный id'));
       } else {
-        // res.status(500).send({ message: 'Произошла ошибка сервера', err });
         next(new ServerError('Произошла ошибка сервера'));
       }
     });

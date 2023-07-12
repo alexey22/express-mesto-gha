@@ -1,14 +1,11 @@
-/* eslint-disable max-classes-per-file */
-// class AbstractError extends Error {
-//   constructor(err) {
-//     super(err);
-//     this.message = err.body;
-//     this.statusCode = err.statusCode;
-//   }
-// }
-
 const errorHandler = (err, req, res, next) => {
-  res.status(err.statusCode).send({ message: err.message });
+  // если у ошибки нет статуса, выставляем 500
+  const { statusCode = 500, message } = err;
+
+  res.status(statusCode).send({
+    // проверяем статус и выставляем сообщение в зависимости от него
+    message: statusCode === 500 ? 'Ошибка сервера' : message,
+  });
   next();
 };
 

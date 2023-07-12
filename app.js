@@ -5,9 +5,11 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const { celebrate, Joi, errors } = require('celebrate');
+const { isURL } = require('joi');
 
 const { createUser, login } = require('./controllers/users');
 const errorHandler = require('./middlewares/error');
+const BadRequest = require('./errors/badRequest');
 
 const { PORT = 3000, BASE_PATH } = process.env;
 const app = express();
@@ -23,13 +25,21 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   family: 4,
 });
 
+const validUrl = (url) => {
+  const validate = isURL(url);
+  if (validate) {
+    return url;
+  }
+  throw new BadRequest('Некорректный адрес URL');
+};
+
 app.post(
   '/signup',
   celebrate({
     body: Joi.object().keys({
       name: Joi.string().min(2).max(30),
       about: Joi.string().min(2).max(30),
-      avatar: Joi.string(),
+      avatar: Joi.string().custom(validUrl),
       email: Joi.string().required().email(),
       password: Joi.string().min(8).required(),
     }),

@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const { celebrate, Joi, errors } = require('celebrate');
-const { isURL } = require('joi');
+const { isURL, isEmail } = require('joi');
 
 const { createUser, login } = require('./controllers/users');
 const errorHandler = require('./middlewares/error');
@@ -25,12 +25,20 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   family: 4,
 });
 
+const validEmail = (email) => {
+  const validate = isEmail(email);
+  if (validate) {
+    return email;
+  }
+  throw new BadRequest('Некорректный email');
+};
+
 const validUrl = (url) => {
   const validate = isURL(url);
   if (validate) {
     return url;
   }
-  throw new BadRequest('Некорректный адрес URL');
+  throw new BadRequest('Некорректный URL');
 };
 
 app.post(
@@ -40,7 +48,7 @@ app.post(
       name: Joi.string().min(2).max(30),
       about: Joi.string().min(2).max(30),
       avatar: Joi.string().custom(validUrl),
-      email: Joi.string().required().email(),
+      email: Joi.string().required().email().custom(validEmail),
       password: Joi.string().min(8).required(),
     }),
   }),
@@ -51,7 +59,7 @@ app.post(
   '/signin',
   celebrate({
     body: Joi.object().keys({
-      email: Joi.string().required().email(),
+      email: Joi.string().required().email().custom(validEmail),
       password: Joi.string().required(),
     }),
   }),

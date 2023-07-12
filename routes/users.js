@@ -17,14 +17,14 @@ const validUrl = (url) => {
   if (validate) {
     return url;
   }
-  throw new BadRequest('Некорректный адрес URL');
+  throw new BadRequest('Некорректный URL');
 };
 
 const validId = (id) => {
   if (/^[0-9a-fA-F]{24}$/.test(id)) {
     return id;
   }
-  throw new BadRequest('Передан некорретный id.');
+  throw new BadRequest('Некорретный id');
 };
 
 router.get('/me', getUser);

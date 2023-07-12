@@ -1,4 +1,5 @@
 const BadRequest = require('../errors/badRequest');
+const Forbidden = require('../errors/forbidden');
 const NotFound = require('../errors/notFound');
 const ServerError = require('../errors/serverError');
 const Card = require('../models/card');
@@ -38,26 +39,39 @@ const createCard = (req, res, next) => {
 
 const deleteCard = (req, res, next) => {
   const { cardId } = req.params;
-  Card.findByIdAndRemove(cardId, { new: true })
-    .then((card) => {
-      if (card) {
-        res.status(200).send(card);
-      } else {
-        // res
-        //   .status(404)
-        //   .send({ message: 'Удаляемая карточка с таким id не найдена' });
-        next(new NotFound('Удаляемая карточка с таким id не найдена'));
-      }
-    })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        // res.status(400).send({ message: 'Некорректный id карточки' });
-        next(new BadRequest('Некорректный id карточки'));
-      } else {
-        // res.status(500).send({ message: 'Произошла ошибка' });
-        next(new ServerError('Произошла ошибка сервера'));
-      }
-    });
+
+  const userId = req.user._id;
+
+  Card.findById(cardId).then((card) => {
+    if (card.owner !== userId) {
+      next(
+        new Forbidden(
+          'Пользователь не может удалять карточки других пользователей',
+        ),
+      );
+    } else {
+      Card.findByIdAndRemove(cardId, { new: true })
+        .then((findedCard) => {
+          if (card) {
+            res.status(200).send(findedCard);
+          } else {
+            // res
+            //   .status(404)
+            //   .send({ message: 'Удаляемая карточка с таким id не найдена' });
+            next(new NotFound('Удаляемая карточка с таким id не найдена'));
+          }
+        })
+        .catch((err) => {
+          if (err.name === 'CastError') {
+            // res.status(400).send({ message: 'Некорректный id карточки' });
+            next(new BadRequest('Некорректный id карточки'));
+          } else {
+            // res.status(500).send({ message: 'Произошла ошибка' });
+            next(new ServerError('Произошла ошибка сервера'));
+          }
+        });
+    }
+  });
 };
 
 const addCardLike = (req, res, next) => {

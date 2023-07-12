@@ -156,7 +156,9 @@ const login = (req, res, next) => {
     .select('+password')
     .orFail(() => {
       // new Error('Пользователь не найден'))
-      next(new NotFound('Пользователь не найден'));
+      next(
+        new UnauthorizedError('Пользователь с таким email и паролем не найден'),
+      );
     })
     .then((user) => {
       // Проверить совпадает ли пароль
@@ -184,7 +186,9 @@ const login = (req, res, next) => {
           } else {
             // Если не совпадает -- вернуть ошибку
             // res.status(401).send({ message: 'Неправильный пароль' });
-            throw new UnauthorizedError('Неправильный пароль');
+            throw new UnauthorizedError(
+              'Пользователь с таким email и паролем не найден',
+            );
           }
         })
         .catch(next);

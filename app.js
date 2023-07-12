@@ -5,7 +5,8 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const { celebrate, Joi, errors } = require('celebrate');
-const { isURL, isEmail } = require('joi');
+const isURL = require('validator/lib/isURL');
+const isEmail = require('validator/lib/isEmail');
 
 const { createUser, login } = require('./controllers/users');
 const errorHandler = require('./middlewares/error');

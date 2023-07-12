@@ -13,7 +13,7 @@ const errorHandler = require('./middlewares/error');
 const BadRequest = require('./errors/badRequest');
 
 const { PORT = 3000, BASE_PATH } = process.env;
-process.env.JWT.SECRET = 'SUPER-SECRET-KEY';
+process.env['JWT.SECRET'] = process.env['JWT.SECRET'] || 'SUPER-SECRET-KEY';
 const app = express();
 
 const router = require('./routes');

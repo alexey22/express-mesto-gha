@@ -45,7 +45,7 @@ const deleteCard = (req, res, next) => {
   Card.findById(cardId).then((card) => {
     if (!card) {
       next(new NotFound('Удаляемая карточка с таким id не найдена'));
-    } else if (!card.owner.equals(req.user._id)) {
+    } else if (!card.owner.equals(userId)) {
       next(
         new Forbidden(
           'Пользователь не может удалять карточки других пользователей',

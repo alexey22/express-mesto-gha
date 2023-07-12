@@ -39,6 +39,7 @@ const getAllUsers = (req, res, next) => {
 };
 
 const createUser = (req, res, next) => {
+  // eslint-disable-next-line object-curly-newline
   const { email, password, name, about, avatar } = req.body;
 
   // проверяем нет ли пользователя с таким паролем
